@@ -1,8 +1,9 @@
 #!/usr/bin/python
 """A python interface to search iTunes Store"""
 import os
-import urllib2, urllib
-import urlparse
+import urllib
+import numbers
+from six.moves import urllib
 import re
 import datetime
 try:
@@ -34,6 +35,8 @@ __cache_dir = './cache'  # Set cache directory
 
 
 def clean_json(data):
+   if isinstance(data, bytes):
+       data = data.decode()
    return data.replace('\\\\', r'//').replace(r"\'", '\"').replace(r'\"', '').replace(r'\u','')
 
 
@@ -65,23 +68,24 @@ class _Request(object):
         data = []
         for name in self.params.keys():
             value = self.params[name]
-            if isinstance(value, int) or isinstance(value, float) or isinstance(value, long):
+            # if isinstance(value, int) or isinstance(value, float) or isinstance(value, long):
+            if isinstance(value, numbers.Integral) or isinstance(value, float) :
                 value = str(value)
             try:
-                data.append('='.join((name, urllib.quote_plus(value.replace('&amp;', '&').encode('utf8')))))
+                data.append('='.join((name, urllib.parse.quote_plus(value.replace('&amp;', '&').encode('utf8')))))
             except UnicodeDecodeError:
-                data.append('='.join((name, urllib.quote_plus(value.replace('&amp;', '&')))))
+                data.append('='.join((name, urllib.parse.quote_plus(value.replace('&amp;', '&')))))
         data = '&'.join(data)
 
         url = HOST_NAME
-        parsed_url = urlparse.urlparse(url)
+        parsed_url = urllib.parse.urlparse(url)
         if not parsed_url.scheme:
             url = "http://" + url
         url += self.method + '?'
         url += data
 
-        request = urllib2.Request(url)
-        response = urllib2.urlopen(request)
+        request = urllib.request.Request(url)
+        response = urllib.request.urlopen(request)
         return response.read()
 
     def execute(self, cacheable=False):
@@ -147,7 +151,7 @@ class _BaseObject(object):
 
     def get(self):
         self._json_results = self._request(cacheable=is_caching_enabled())
-        if self._json_results.has_key('errorMessage'):
+        if 'errorMessage' in self._json_results:
             raise ServiceException(type='Error', message=self._json_results['errorMessage'])
         self._num_results = self._json_results['resultCount']
         l = []
