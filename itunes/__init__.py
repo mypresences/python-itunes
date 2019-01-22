@@ -157,9 +157,9 @@ class _BaseObject(object):
         l = []
         for json in self._json_results['results']:
             type = None
-            if json.has_key('wrapperType'):
+            if 'wrapperType' in json:
                 type = json['wrapperType']
-            elif json.has_key('kind'):
+            elif 'kind' in json:
                 type = json['kind']
 
             if type == 'artist':
@@ -178,9 +178,9 @@ class _BaseObject(object):
                 id = json['trackId']
                 item = Software(id)
             else:
-                if json.has_key('collectionId'):
+                if 'collectionId' in json:
                     id = json['collectionId']
-                elif json.has_key('artistId'):
+                elif 'artistId' in json:
                     id = json['artistId']
                 item = Item(id)
             item._set(json)
@@ -257,7 +257,7 @@ class Item(object):
     def _set(self, json):
         self.json = json
         #print json
-        if json.has_key('kind'):
+        if 'kind' in json:
             self.type = json['kind']
         else:
             self.type = json['wrapperType']
@@ -273,7 +273,7 @@ class Item(object):
 
     def _set_release(self, json):
         self.release_date = None
-        if json.has_key('releaseDate') and json['releaseDate']:
+        if 'releaseDate' in json and json['releaseDate']:
             self.release_date = json['releaseDate'].split('T')[0]
 
     def _set_country(self, json):
@@ -281,32 +281,32 @@ class Item(object):
 
     def _set_artwork(self, json):
         self.artwork = dict()
-        if json.has_key('artworkUrl30'):
+        if 'artworkUrl30' in json:
             self.artwork['30'] = json['artworkUrl30']
-        if json.has_key('artworkUrl60'):
+        if 'artworkUrl60' in json:
             self.artwork['60'] = json['artworkUrl60']
-        if json.has_key('artworkUrl100'):
+        if 'artworkUrl100' in json:
             self.artwork['100'] = json['artworkUrl100']
-        if json.has_key('artworkUrl512'):
+        if 'artworkUrl512' in json:
             self.artwork['512'] = json['artworkUrl512']
-        if json.has_key('artworkUrl1100'):
+        if 'artworkUrl1100' in json:
             self.artwork['1100'] = json['artworkUrl1100']
 
     def _set_url(self, json):
         self.url = None
-        if json.has_key('trackViewUrl'):
+        if 'trackViewUrl' in json:
             self.url = json['trackViewUrl']
-        elif json.has_key('collectionViewUrl'):
+        elif 'collectionViewUrl' in json:
             self.url = json['collectionViewUrl']
-        elif json.has_key('artistViewUrl'):
+        elif 'artistViewUrl' in json:
             self.url = json['artistViewUrl']
 
     # REPR, EQ, NEQ
     def __repr__(self):
         if not self.name:
-            if self.json.has_key('collectionName'):
+            if 'collectionName' in self.json:
                 self._set_name(self.json['collectionName'])
-            elif self.json.has_key('artistName'):
+            elif 'artistName' in self.json:
                 self._set_name(self.json['artistName'])
         return self.name.encode('utf8')
 
@@ -326,9 +326,9 @@ class Item(object):
     # GETTERs
     def get_id(self):
         if not self.id:
-            if self.json.has_key('collectionId'):
+            if 'collectionId' in self.json:
                 self.id = self.json['collectionId']
-            elif self.json.has_key('artistId'):
+            elif 'artistId' in self.json:
                 self.id = self.json['artistId']
         return self.id
 
@@ -470,11 +470,11 @@ class Track(Item):
         self.url = json.get('trackViewUrl', None)
         self.preview_url = json.get('previewUrl', None)
         self.price = None
-        if json.has_key('trackPrice') and json['trackPrice'] is not None:
+        if 'trackPrice' in json and json['trackPrice'] is not None:
             self.price = round(json['trackPrice'], 4)
         self.number = json.get('trackNumber', None)
         self.duration = None
-        if json.has_key('trackTimeMillis') and json['trackTimeMillis'] is not None:
+        if 'trackTimeMillis' in json and json['trackTimeMillis'] is not None:
             self.duration = round(json.get('trackTimeMillis', 0.0)/1000.0, 2)
         try:
             self._set_artist(json)
@@ -550,7 +550,7 @@ class Software(Track):
 
     def _set_current_version_release_date(self, json):
         self.current_version_release_date = None
-        if json.has_key('currentVersionReleaseDate') and json['currentVersionReleaseDate']:
+        if 'currentVersionReleaseDate' in json and json['currentVersionReleaseDate']:
             self.current_version_release_date = datetime.datetime.strptime( json['currentVersionReleaseDate'], r'%Y-%m-%dT%H:%M:%SZ' )
 
     def _set_bundle_id(self, json):
