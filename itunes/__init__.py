@@ -493,7 +493,7 @@ class Track(Item):
             self.artist._set(json)
 
     def _set_album(self, json):
-        if json.has_key('collectionId'):
+        if 'collectionId' in json:
             id = json['collectionId']
             self.album = Album(id)
             self.album._set(json)
