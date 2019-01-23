@@ -96,7 +96,7 @@ class _Request(object):
                 response = self._download_response()
             response = clean_json(response)
             return json.loads(response)
-        except urllib2.HTTPError as e:
+        except urllib.HTTPError as e:
             raise self._get_error(e.fp.read())
 
     def _get_cache_key(self):
