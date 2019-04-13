@@ -3,7 +3,6 @@
 import os
 import urllib
 import numbers
-from six.moves import urllib
 import re
 import datetime
 try:
@@ -96,7 +95,7 @@ class _Request(object):
                 response = self._download_response()
             response = clean_json(response)
             return json.loads(response)
-        except urllib.HTTPError as e:
+        except urllib.error.HTTPError as e:
             raise self._get_error(e.fp.read())
 
     def _get_cache_key(self):
